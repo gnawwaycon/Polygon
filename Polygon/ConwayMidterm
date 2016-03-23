@@ -1,0 +1,725 @@
+Script started on Wed 28 Oct 2015 09:43:38 PM EDT
+]0;conwaywang@storm:~/cs2000/midterm[conwaywang@storm midterm]$ pwd
+/home/students/FALL15/conwaywang/cs2000/midterm
+]0;conwaywang@storm:~/cs2000/midterm[conwaywang@storm midterm]$ cat Polygon.h Polygon.cpp pdriver.cpp Name.h Name.cpp D[KDart[K[Kre[K[Kte.h Dare[K[Kte.cpp
+/*
+ *Conway Wang 9/20/15
+ *lab 3-midterm revision cisc 2000
+ *Header file for the Polygon class
+ */
+
+#ifndef POLYGON_H
+#define POLYGON_H
+
+#include <iostream>
+#include <cstdlib>
+
+using namespace std;
+
+class Polygon{
+public:
+    Polygon();//default constructor
+    Polygon(int,int);//constructor with width and legth
+    Polygon(int,int,int,int);//constructor with width length max and min
+	~Polygon();//destructor adjusts class level statistics
+    bool setLength(int), setWidth(int);
+    void input();
+    int getArea() const;
+    int  getPerimeter() const;
+    void displayInfo() const;
+    void draw() const;
+    void displayData() const;
+    int calculateA(int,int), calculateP(int,int);
+    static int getNumPolygons();
+    static int getMAX_POLYGONS();
+
+private:
+
+    static const int DEFAULT_MIN=10, DEFAULT_MAX=100, MAX_POLYGONS=25;//static const declared in the class
+    static int numPolygons;
+	static double pTrack,aTrack;
+    const int MIN, MAX;
+    int length, width, area, perimeter;
+};
+
+#endif
+/*
+Conway Wang 10/28/15
+lab midterm cisc 2000
+Function definitions for the Polygon class
+*/
+
+#include "Polygon.h"
+
+int Polygon::numPolygons;
+double Polygon::pTrack;
+double Polygon::aTrack;
+
+Polygon::Polygon():MIN(DEFAULT_MIN), MAX(DEFAULT_MAX)//default constructor
+{
+    length=0, width=0, area=0, perimeter=0;
+}
+
+Polygon::Polygon(int a, int b):MIN(a),MAX(b)//constructor for when min and max values are passed
+{
+    length=0, width=0, area=0, perimeter=0;
+	numPolygons++;
+}
+
+Polygon::Polygon(int a, int b, int c,int d):MIN(c),MAX(d)//constructor for when length and width and min and max values are passed
+{
+    length=a, width=b;
+    calculateA(a,b);//variable area is set in the calculate method
+    calculateP(a,b);//variable perimeter is set in the calculate method
+}
+
+//destructor
+Polygon::~Polygon()
+{
+    numPolygons--;//1 less polygon
+    pTrack-=perimeter;//perimeter is subtracted from total perimeter
+    aTrack-=area;//area is subtracted from total area
+}
+
+void Polygon::input()//takes in user input to fill data members
+{
+    int l,w;
+
+    do//asks for length of polygon until input is in range
+    {
+        cout << "What is the length of the polygon?\n";
+        cin >> l;
+    }while(!setLength(l));
+
+    do//asks for width of polygon until input is in range
+    {
+        cout << "What is the width of the polygon?\n";
+        cin >> w;
+    }while(!setWidth(w));
+    numPolygons++;
+    area = calculateA(l,w);//calculates area
+    perimeter = calculateP(l,w);//calculates perimeter
+}
+
+bool Polygon::setLength(int l)//checks if the length is within min and max and stops loop and sets the length if it is
+{
+    bool a=false;
+    if(l>=MIN && l<=MAX)
+    {
+        length=l;
+        a=true;
+    }
+    return (a);
+}
+
+bool Polygon::setWidth(int w)//checks if the width is within min and max and stops loop and sets the width if it is
+{
+    bool a=false;
+    if(w>=MIN && w<=MAX)
+    {
+        width=w;
+        a=true;
+    }
+    return a;
+}
+
+void Polygon::draw() const
+{
+    for(int x=0; x<width; x++)//what to print for each row
+    {
+        for(int y=0; y<length; y++)
+        {
+                if(x==0||x==(width-1))//if first row all x's
+                {
+                    cout<< 'x';
+                }
+
+                else if(y==0||y==(length-1))//if column first or last, x
+                {
+                        cout << 'x';
+                }
+
+                else
+                {
+                        cout << ' ';//otherwise blank
+                }
+    }
+    cout<< endl;
+}
+}
+
+void Polygon::displayInfo() const//displays private data members of the function
+{
+    cout << "length: " << length << endl;
+    cout << "width: " << width << endl;
+    cout << "area: " << area << endl;
+    cout << "perimeter: " << perimeter << endl;
+}
+
+void Polygon::displayData() const
+{
+    cout << "number of polygons: " << numPolygons << endl;
+    cout << "average area: " <<  aTrack/numPolygons << endl;//total area divided by number of polygons gives average area
+    cout << "average perimeter " << pTrack/numPolygons << endl;//total perimeter divided by number of polygons gives average perimeter
+}
+
+int Polygon::calculateA(int length,int width)
+{
+	area = length*width;
+	aTrack += area;//adds on area to static variable keeping track of the sum of all areas
+    return area;
+}
+
+int Polygon::calculateP(int length,int width)
+{
+	perimeter=2*length*2*width;
+	pTrack+=perimeter;//adds on perimeter to static variable keeping track of the sum of all perimeters
+    return perimeter;
+}
+
+int Polygon::getNumPolygons()
+{
+    return numPolygons;
+}
+
+int Polygon::getMAX_POLYGONS()
+{
+    return MAX_POLYGONS;
+}
+
+int Polygon::getPerimeter() const
+{
+    return perimeter;
+}
+
+int Polygon::getArea() const
+{
+    return area;
+}
+/*
+Conway Wang 10/28/15
+lab midterm cisc 2000
+Driver file for the Polygon class
+*/
+
+
+/*Include directives for polygon date and name classes
+ *
+ */
+
+#include "Polygon.h"
+#include "Date.h"
+#include "Name.h"
+
+int main()
+{
+//function definitions to be called in the menus
+    void displayStat(Polygon**, Date, Name);//displays summary statistics of all the polygons along with the name and date
+    void deletePoly(Polygon**, int, int);//deletes a polygon with an index and number of polygons as integers being passed to the function
+    bool valid(int);//checks if user choice for a polygon exists
+
+    Polygon *rect[Polygon::getMAX_POLYGONS()];//array of pointers of the polygon class
+
+
+    bool cont=true;//keeps asking for user input until they choose to exit
+    int choice;//keeps track of what the user inputs as their choice
+    int polyChoice;//keeps track of which polygon user wants drawn of data shown
+
+    Date createdOn;//initializing object of type date
+    Name createdBy;//initializing object of type name
+
+    createdOn.input("What is the day you are creating these polygons?");
+
+    cout << "Who is the creator of these polygons?" << endl;
+    createdBy.input();
+
+    while(cont)
+    {
+        cout << "What would you like to do?" << endl;
+        cout << "1) Enter a polygon" << endl;
+        cout << "2) Draw a polygon" << endl;
+        cout << "3) Show data of a polygon" << endl;
+        cout << "4) Show summary statistics" << endl;
+        cout << "5) Delete a polygon" << endl;
+        cout << "6) Exit" << endl;
+        cin >> choice;
+
+        switch(choice)//switch statement determines course of action
+        {
+        case 1:
+            rect[Polygon::getNumPolygons()]=new Polygon;
+            rect[Polygon::getNumPolygons()]->input();//calls input function on the index of the polygon array that user is on
+            break;
+
+        case 2:
+
+            do {//choice checks if a polygon is in range
+            cout << "Which one?" << endl;
+            cin >> polyChoice;
+            }while(!valid(polyChoice));
+
+            rect[polyChoice-1]->draw();//finds polygon requested to draw
+            break;
+
+        case 3:
+
+            do{
+            cout << "Which one?" << endl;
+            cin >> polyChoice;
+            }while(!valid(polyChoice));
+
+            (*rect[polyChoice-1]).displayInfo();//displays info of polygon requested
+            break;
+
+        case 4:
+            displayStat(rect, createdOn, createdBy);//displays overall statistics and name and date
+            break;
+
+        case 5:
+
+            do{
+            cout << "Which one?" << endl;
+            cin >> polyChoice;
+            }while(!valid(polyChoice));
+
+            deletePoly(rect, polyChoice, Polygon::getNumPolygons());
+            break;
+
+        case 6:
+            cont=false;//stops the next iteration of the while loop
+            break;
+
+        default:
+            cout << "Invalid choice enter another one" << endl;
+            break;
+        }
+    }
+
+}
+
+void displayStat(Polygon *a[], Date createdOn, Name createdBy)
+{
+    cout << "Polygons created on: ";
+    createdOn.display();//calls display on date object from user input passed to the function
+    cout << " by: ";
+    createdBy.display();//calls display on name object from user input passed to the function
+
+    a[0]->displayData();//calls summary statistics which outputs static variables so any instance of the class is allowed
+}
+
+void deletePoly(Polygon *a[], int index, int numPoly)
+{
+    delete a[index-1];//deletes pointer from user input, summary statistics are updated by the destructor
+
+    for(int x=index-1; x<numPoly-1; x++)//loops until second to last object is reached
+    {
+        a[x]=a[x+1];//shifting the pointers over by one
+    }
+}
+
+bool valid(int c)
+{
+    bool inRange=false;
+
+    int range=Polygon::getNumPolygons();//the range is the total number of polygons
+
+    if(c>0&&c<=range)//must lie in the range
+        inRange=true;
+
+    return inRange;//if if statement isnt executed then the false value is returned
+}
+//conway wang 9/30/15
+//header file for the name class
+
+#ifndef NAME_H
+#define NAME_H
+
+#include <iostream>
+#include <cstdlib>
+
+using namespace std;
+
+class Name
+{
+public:
+    void input();
+    void display();
+    Name();
+    Name(string, char , string);
+    Name(string, string);
+    void setName(string, char , string);
+    string getFname();
+    char getMinit();
+    string getLname();
+
+private:
+    string Fname, Lname;
+    char Minit;
+};
+
+#endif
+//conway wang 9/30/15
+//function definitions for Name class
+
+#include "Name.h"
+
+Name::Name()//default constructor
+{
+    Fname="Scott";
+    Lname="Fitzgerald";
+    Minit='F';
+}
+
+Name::Name(string f, char m, string l)//overloaded constructor with name parameters
+{
+
+    Fname = f;
+    Minit = m;
+    Lname = l;
+}
+
+Name::Name(string f, string l)//overloaded constructor with name parameters if no middle init
+{
+    Fname= f;
+    Minit=' ';
+    Lname=l;
+}
+
+void Name::display()
+{
+    cout << Fname << " " << Minit << " " << Lname << endl;
+}
+
+void Name::setName(string f, char m, string l)
+{
+    Fname = f;
+    Minit = m;
+    Lname = l;
+}
+
+void Name::input()
+{
+    char check;
+    cout << "What is your first name?" << endl;
+    cin >> Fname;
+    cout << "What is your middle initial? (if N/A enter #)" << endl;
+    cin >> check;
+
+    if(check == '#')
+        Minit = ' ';
+    else
+        Minit = check;
+
+    cout<< "What is your last name?" << endl;
+    cin>>Lname;
+}
+
+string Name::getFname()
+{
+    return Fname;
+}
+
+char Name::getMinit()
+{
+    return Minit;
+}
+
+string Name::getLname()
+{
+    return Lname;
+}
+//conway wang 9/30/15
+//header file for the date class
+
+#ifndef DATE_H
+#define DATE_H
+
+#include <iostream>
+#include <cstdlib>
+
+using namespace std;
+
+class Date
+{
+public:
+    void input(string a);
+    void display();
+    Date();
+    Date(int, int, int);
+    bool setDate(int, int, int);
+    int getMonth();
+	int getDay();
+	int getYear();
+
+private:
+    int day, month, year;
+};
+
+
+#endif
+//conway wang 9/30/15
+//function definitions for Date class
+
+#include "Date.h"
+
+Date::Date(){
+	day=1;
+	month=1;
+	year=1900;
+}
+
+
+
+Date::Date(int m, int d, int y)
+{
+    day=d;
+    month=m;
+    year=y;
+}
+
+void Date::display()
+{
+    cout << month << "/" << day << "/" << year << endl;
+}
+
+bool Date::setDate(int m, int d, int y)
+{
+    day=d;
+    year=y;
+    if(m<1||m>12)//wont set m to value passed to mutator if it isn't valid
+    {
+        return true;
+    }
+    month=m;
+    if(m==3)//february
+        return (!(d>=1||d<=29));//if lies within range of month returns false if it doesnt returns true
+    else if(m%2==1)
+        return (!(d>=1||d<=31));
+    else
+        return (!(d>=1||d<=30));
+
+}
+
+void Date::input(string a)
+{
+    int m,d,y;
+    cout<< a << endl;
+    cin>> m >> d >> y;
+    while(setDate(m,d,y))
+    {
+        cout<<"Invalid input re-enter date" << endl;
+        cin>> m >> d >> y;
+    }
+}
+
+int Date::getMonth()
+{
+	return( month );
+}
+
+int Date::getDay()
+{
+	return( day );
+}
+
+int Date::getYear()
+{
+	return( year );
+}
+]0;conwaywang@storm:~/cs2000/midterm[conwaywang@storm midterm]$ cat Polygon.h Polygon.cpp pdriver.cpp Name.h Name.cpp Date.h Date.cpp[C[C[1P[1P[1P[1@g[1@+[1@+
+]0;conwaywang@storm:~/cs2000/midterm[conwaywang@storm midterm]$ ./a.out
+What is the day you are creating these polygons?
+10 28 2015
+Who is the creator of these polygons?
+What is your first name?
+Conway
+What is your middle initial? (if N/A enter #)
+#
+What is your last name?
+Wang  
+What would you like to do?
+1) Enter a polygon
+2) Draw a polygon
+3) Show data of a polygon
+4) Show summary statistics
+5) Delete a polygon
+6) Exit
+1
+What is the length of the polygon?
+10
+What is the width of the polygon?
+9
+What is the width of the polygon?
+10
+What would you like to do?
+1) Enter a polygon
+2) Draw a polygon
+3) Show data of a polygon
+4) Show summary statistics
+5) Delete a polygon
+6) Exit
+1
+What is the length of the polygon?
+15
+What is the width of the polygon?
+20
+What would you like to do?
+1) Enter a polygon
+2) Draw a polygon
+3) Show data of a polygon
+4) Show summary statistics
+5) Delete a polygon
+6) Exit
+1
+What is the length of the polygon?
+20
+What is the width of the polygon?
+15
+What would you like to do?
+1) Enter a polygon
+2) Draw a polygon
+3) Show data of a polygon
+4) Show summary statistics
+5) Delete a polygon
+6) Exit
+2
+Which one?
+1
+xxxxxxxxxx
+x        x
+x        x
+x        x
+x        x
+x        x
+x        x
+x        x
+x        x
+xxxxxxxxxx
+What would you like to do?
+1) Enter a polygon
+2) Draw a polygon
+3) Show data of a polygon
+4) Show summary statistics
+5) Delete a polygon
+6) Exit
+2
+Which one?
+3
+xxxxxxxxxxxxxxxxxxxx
+x                  x
+x                  x
+x                  x
+x                  x
+x                  x
+x                  x
+x                  x
+x                  x
+x                  x
+x                  x
+x                  x
+x                  x
+x                  x
+xxxxxxxxxxxxxxxxxxxx
+What would you like to do?
+1) Enter a polygon
+2) Draw a polygon
+3) Show data of a polygon
+4) Show summary statistics
+5) Delete a polygon
+6) Exit
+2
+Which one?
+4
+Which one?
+3
+xxxxxxxxxxxxxxxxxxxx
+x                  x
+x                  x
+x                  x
+x                  x
+x                  x
+x                  x
+x                  x
+x                  x
+x                  x
+x                  x
+x                  x
+x                  x
+x                  x
+xxxxxxxxxxxxxxxxxxxx
+What would you like to do?
+1) Enter a polygon
+2) Draw a polygon
+3) Show data of a polygon
+4) Show summary statistics
+5) Delete a polygon
+6) Exit
+3
+Which one?
+2
+length: 15
+width: 20
+area: 300
+perimeter: 1200
+What would you like to do?
+1) Enter a polygon
+2) Draw a polygon
+3) Show data of a polygon
+4) Show summary statistics
+5) Delete a polygon
+6) Exit
+3
+Which one?
+2
+length: 15
+width: 20
+area: 300
+perimeter: 1200
+What would you like to do?
+1) Enter a polygon
+2) Draw a polygon
+3) Show data of a polygon
+4) Show summary statistics
+5) Delete a polygon
+6) Exit
+4
+Polygons created on: 10/28/2015
+ by: Conway   Wang
+number of polygons: 3
+average area: 233.333
+average perimeter 933.333
+What would you like to do?
+1) Enter a polygon
+2) Draw a polygon
+3) Show data of a polygon
+4) Show summary statistics
+5) Delete a polygon
+6) Exit
+5
+Which one?
+2
+What would you like to do?
+1) Enter a polygon
+2) Draw a polygon
+3) Show data of a polygon
+4) Show summary statistics
+5) Delete a polygon
+6) Exit
+4
+Polygons created on: 10/28/2015
+ by: Conway   Wang
+number of polygons: 2
+average area: 200
+average perimeter 800
+What would you like to do?
+1) Enter a polygon
+2) Draw a polygon
+3) Show data of a polygon
+4) Show summary statistics
+5) Delete a polygon
+6) Exit
+6
+]0;conwaywang@storm:~/cs2000/midterm[conwaywang@storm midterm]$ exit
+exit
+
+Script done on Wed 28 Oct 2015 09:46:54 PM EDT

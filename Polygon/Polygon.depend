@@ -1,0 +1,27 @@
+# depslib dependency file v1.0
+1446081391 source:c:\users\conway\documents\coding\polygon\polygon\date.cpp
+	"Date.h"
+
+1446068968 c:\users\conway\documents\coding\polygon\polygon\date.h
+	<iostream>
+	<cstdlib>
+
+1446068968 source:c:\users\conway\documents\coding\polygon\polygon\name.cpp
+	"Name.h"
+
+1446068968 c:\users\conway\documents\coding\polygon\polygon\name.h
+	<iostream>
+	<cstdlib>
+
+1446082477 source:c:\users\conway\documents\coding\polygon\polygon\pdriver.cpp
+	"Polygon.h"
+	"Date.h"
+	"Name.h"
+
+1446082477 c:\users\conway\documents\coding\polygon\polygon\polygon.h
+	<iostream>
+	<cstdlib>
+
+1446082477 source:c:\users\conway\documents\coding\polygon\polygon\polygon.cpp
+	"Polygon.h"
+
